@@ -16,18 +16,14 @@ const FilterTableFields = props => {
   };
 
   return (
-    <ul className="list-inline">
+    <ul className="btn-group list-inline">
       {Object.keys(tableFields).map(key => (
         <li key={key} className="list-inline-item">
-          <label htmlFor={`check${key}`}>
-            <input
-              type="checkbox"
-              defaultChecked={tableFields[key].visible ? 'checked' : ''}
-              onChange={() => toggleField(key)}
-              id={`check${key}`}
-            />
-            {tableFields[key].name}
-          </label>
+          <button
+            type="button"
+            className={`btn ${tableFields[key].visible ? 'btn-secondary active' : 'btn-light'}`}
+            onClick={() => toggleField(key)}
+          >{tableFields[key].name}</button>
         </li>
       ))}
     </ul>
