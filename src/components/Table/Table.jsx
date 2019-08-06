@@ -6,51 +6,52 @@ import Row from './Row';
 const Table = props => {
   const { data, tableFields, setFilters, highlightedOnly } = props;
 
-  const renderHeadField = key => {
-    if (tableFields[key].visible) {
-      if (tableFields[key].filterable) {
-        return (
-          <th key={key}>
-            {tableFields[key].name}{' '}
+  const renderTHeadField = key => {
+    const { visible, name, filterable, exact } = tableFields[key];
+    return (
+      visible && (
+        <th key={key}>
+          {name}{' '}
+          {filterable && (
             <input
               type="text"
-              placeholder={
-                tableFields[key].exact
-                  ? `Точное значение ${key}`
-                  : `Часть ${key}`
-              }
+              placeholder={exact ? `Точное значение ${key}` : `Часть ${key}`}
               onChange={e =>
                 setFilters({
                   [key]: {
                     value: e.target.value,
-                    exact: tableFields[key].exact || false
+                    exact: exact || false
                   }
                 })
               }
             />
-          </th>
-        );
-      }
-      return <th key={key}>{tableFields[key].name}</th>;
-    }
-    return null;
+          )}
+        </th>
+      )
+    );
   };
 
   return (
     <table className="table table-striped table-hover table-sm">
       <thead>
-        <tr>{Object.keys(tableFields).map(key => renderHeadField(key))}</tr>
+        <tr>{Object.keys(tableFields).map(key => renderTHeadField(key))}</tr>
       </thead>
       <tbody>
         {data.length > 0 ? (
-          Object.keys(data).map(key => (
-            <Row
-              key={`${key}${data[key].bsonum}`}
-              tableFields={tableFields}
-              data={data[key]}
-              highlightedOnly={highlightedOnly}
-            />
-          ))
+          Object.keys(data).map(key => {
+            const { isVisible, isHighlighted } = data[key];
+            return (
+              isVisible &&
+              (!highlightedOnly || isHighlighted) && (
+                <Row
+                  key={`${key}${data[key].bsonum}`}
+                  tableFields={tableFields}
+                  data={data[key]}
+                  highlightedOnly={highlightedOnly}
+                />
+              )
+            );
+          })
         ) : (
           <tr>
             <td>
@@ -66,9 +67,7 @@ const Table = props => {
 
 Table.propTypes = {
   data: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
-  tableFields: PropTypes.objectOf(
-    PropTypes.object
-  ).isRequired,
+  tableFields: PropTypes.objectOf(PropTypes.object).isRequired,
   setFilters: PropTypes.func.isRequired,
   highlightedOnly: PropTypes.bool
 };

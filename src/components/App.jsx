@@ -2,41 +2,45 @@ import React, { useState, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import DatePicker from 'react-datepicker';
+import Controls from './Controls';
+import Stat from './Stat';
 import Table from './Table';
 import FilterTableFields from './FilterTableFields';
 
-import { apiUrl, tableFieldsConfig, selectLimits } from '../config';
-
-// method to get data from api
-const getDataFromApi = async (url, limit, date) => {
-  const payload = {
-    limit,
-    date
-  };
-  const formData = new FormData();
-  formData.append('json', JSON.stringify(payload));
-  return fetch(url, {
-    method: 'POST',
-    body: formData
-  });
-};
+import { apiUrl, selectLimits } from '../config';
+import {
+  getDataFromApi,
+  getDefaultTableFields,
+  processData,
+  calculateTotalMoney,
+  calculateHighlightedMoney
+} from './helpers';
 
 function App() {
   // cookies
-  const [cookies, setCookie] = useCookies();
-
+  const [cookies, setCookie] = useCookies([]);
   // params sent to api
+  // limit
   const defaultLimit = cookies.limit ? cookies.limit : selectLimits[0].value;
   const [limit, setLimit] = useState(defaultLimit);
+  // save limit to cookie
+  useEffect(() => {
+    setCookie('limit', limit);
+  }, [limit, setCookie]);
+
+  // date
   const defaultDate = cookies.date ? new Date(cookies.date) : new Date();
   const [date, setDate] = useState(defaultDate);
+  // save date to cookie
+  useEffect(() => {
+    setCookie('date', date);
+  }, [date, setCookie]);
 
   // raw data from api
   const [data, setData] = useState([]);
 
   // updated data
-  const [filteredData, setFilteredData] = useState([]);
+  const [processedData, setProcessedData] = useState([]);
   const [filters, setFilters] = useState({});
 
   // some data stats received from api
@@ -48,18 +52,19 @@ function App() {
   const [highlightedMoney, setHighlightedMoney] = useState(0);
 
   // display highlighted only
-  const defaultHighlighted = cookies.highlightedOnly && cookies.highlightedOnly === 'true';
+  const defaultHighlighted =
+    cookies.highlightedOnly && cookies.highlightedOnly === 'true';
   const [highlightedOnly, toggleHighlightedOnly] = useState(defaultHighlighted);
+  // save 'highlightedOnly' flag to cookie
+  useEffect(() => {
+    setCookie('highlightedOnly', highlightedOnly);
+  }, [highlightedOnly, setCookie]);
 
   // table columns to display
-  const defaultTableFields =
-    cookies.defaultTableFields &&
-    Object.keys(cookies.defaultTableFields).length === Object.keys(tableFieldsConfig).length
-      ? cookies.defaultTableFields
-      : tableFieldsConfig;
+  const defaultTableFields = getDefaultTableFields(cookies);
   const [tableFields, updateTableFields] = useState(defaultTableFields);
+  // save date to cookie
   useEffect(() => {
-    // save date to cookie
     setCookie('defaultTableFields', tableFields);
   }, [tableFields, setCookie]);
 
@@ -88,151 +93,22 @@ function App() {
 
   // filter data
   useEffect(() => {
-    const tempData = [];
-    let isVisible;
-    let value;
-    Object.keys(data).forEach(dataKey => {
-      // check for row to be visible
-      isVisible = true;
-      Object.keys(tableFields).forEach(fieldKey => {
-        // compute name
-        value = data[dataKey][fieldKey];
-        if (fieldKey === 'name') {
-          value += data[dataKey].surname;
-        }
-        // check for visible
-        // if filter for this field exists
-        if (typeof filters[fieldKey] !== 'undefined') {
-          // if filter has 'value' field
-          if (
-            typeof filters[fieldKey].value !== 'undefined' &&
-            filters[fieldKey].value.length > 0
-          ) {
-            // if filter has 'exact' field
-            if (
-              typeof filters[fieldKey].exact !== 'undefined' &&
-              filters[fieldKey].exact
-            ) {
-              if (
-                !(
-                  value.toLowerCase().trim() ===
-                  filters[fieldKey].value.toLowerCase().trim()
-                )
-              ) {
-                isVisible = false;
-              }
-            } else if (
-              !value
-                .toLowerCase()
-                .includes(filters[fieldKey].value.toLowerCase())
-            ) {
-              // if value contains
-              isVisible = false;
-            }
-          }
-        }
-      });
-      // check for row to be highlighted
-
-      const isHighlighted =
-        // условие по наличным
-        // HA|CA						type
-        (data[dataKey].type.includes('НА') ||
-          data[dataKey].type.includes('HA')) && // in ru & en
-        data[dataKey].org === '' &&
-        // !99C (L)					General carrier
-        data[dataKey].generalCarrier !== '99C' &&
-        // 921 (R)						Book Stamp
-        data[dataKey].bookStamp.match(/^921/);
-      tempData.push({
-        ...data[dataKey],
-        isHighlighted,
-        isVisible
-      });
-    });
-    setFilteredData(tempData);
+    setProcessedData(processData(data, tableFields, filters));
   }, [tableFields, data, filters]);
 
-  // calculate sum of money
+  // get stats of money
   useEffect(() => {
-    // get total money
-    let result = Object.keys(filteredData).reduce((prev, id) => {
-      let sum = prev;
-      if (filteredData[id].isVisible) {
-        const amount = parseFloat(filteredData[id].amount);
-        if (!amount.isNaN) {
-          if (filteredData[id].optype === 'SALE') {
-            sum += amount;
-          } else if (filteredData[id].optype === 'REFUND') {
-            sum -= amount;
-          }
-        }
-      }
-      return sum;
-    }, 0);
-    result = Math.round(result * 100) / 100;
-    setTotalMoney(result);
+    // total money
+    setTotalMoney(calculateTotalMoney(processedData));
+    // highlighted money
+    setHighlightedMoney(calculateHighlightedMoney(processedData));
+  }, [processedData]);
 
-    // get filtered money
-    result = Object.keys(filteredData).reduce((prev, id) => {
-      let sum = prev;
-      if (filteredData[id].isVisible && filteredData[id].isHighlighted) {
-        const amount = parseFloat(filteredData[id].amount);
-        if (!amount.isNaN) {
-          if (filteredData[id].optype === 'SALE') {
-            sum += amount;
-          } else if (filteredData[id].optype === 'REFUND') {
-            sum -= amount;
-          }
-        }
-      }
-      return sum;
-    }, 0);
-    result = Math.round(result * 100) / 100;
-    setHighlightedMoney(result);
-  }, [filteredData]);
-
-  const stat = (
-    <div className="alert alert-secondary col-6">
-      <label htmlFor="setLimit">
-        Загрузить{' '}
-        <select
-          onChange={e => {
-            const newLimit = e.target.value;
-            // save limit to cookie
-            setCookie('limit', newLimit);
-            setLimit(parseInt(newLimit, 10));
-          }}
-          id="setLimit"
-          defaultValue={limit}
-        >
-          {selectLimits.map(el => (
-            <option key={el.value} value={el.value}>
-              {el.label}
-            </option>
-          ))}
-        </select>{' '}
-        строки из базы{' '}
-      </label>{' '}
-      за{' '}
-      <DatePicker
-        selected={date}
-        onChange={value => setDate(value)}
-        dateFormat="yyyy-MM-dd"
-        timeFormat=""
-      />
-      <p>
-        Из базы загружено {count} из {total} строк. Показано{' '}
-        {filteredData.reduce((sum, item) => {
-          return item.isVisible && (!highlightedOnly || item.isHighlighted)
-            ? sum + 1
-            : sum;
-        }, 0)}{' '}
-        из {count} строк.
-      </p>
-    </div>
-  );
-
+  const visible = processedData.reduce((sum, item) => {
+    return item.isVisible && (!highlightedOnly || item.isHighlighted)
+      ? sum + 1
+      : sum;
+  }, 0);
   return (
     <div className="container">
       <div className="row pt-5">
@@ -243,21 +119,21 @@ function App() {
           Не содержит записей TRAIN_TICKET!
         </div>
         <div className="col-12">
-          {stat}
-          <p>
-            Сумма: <b>{totalMoney}</b> &#x20bd;, подходящие по фильтрам:{' '}
-            <b>{highlightedMoney}</b> &#x20bd;{' '}
-            <input
-              type="button"
-              value={
-                highlightedOnly ? 'Показать все' : 'Показать только подходящие'
-              }
-              onClick={() => {
-                setCookie('highlightedOnly', !highlightedOnly);
-                toggleHighlightedOnly(!highlightedOnly);
-              }}
-            />
-          </p>
+          <Controls
+            setLimit={setLimit}
+            limit={limit}
+            date={date}
+            setDate={setDate}
+            highlightedOnly={highlightedOnly}
+            toggleHighlightedOnly={toggleHighlightedOnly}
+          />
+          <Stat
+            count={count}
+            total={total}
+            visible={visible}
+            totalMoney={totalMoney}
+            highlightedMoney={highlightedMoney}
+          />
         </div>
       </div>
       <div className="row">
@@ -268,7 +144,7 @@ function App() {
             updateTableFields={updateTableFields}
           />
           <Table
-            data={filteredData}
+            data={processedData}
             tableFields={tableFields}
             setFilters={setFilters}
             highlightedOnly={highlightedOnly}
