@@ -27,17 +27,40 @@ const getDataFromApi = async (url, limit, date) => {
 };
 export { getDataFromApi };
 
+// get the initials and append them to surname:
+// Konovalov Konstantin Sergeevich => Konovalov K.S.
+const shortenName = (name = '', surname = '') => {
+  if(!name && surname) {
+    return surname;
+  }
+  if(!name && !surname) {
+    return '';
+  }
+  const initials = name.split(' ').reduce((prev, current) => {
+    return `${prev}${current.charAt(0)}.`;
+  }, '');
+  return `${surname} ${initials}`;
+};
+export { shortenName };
+
 // to get filter data
 const processData = (data, tableFields, filters) => {
   const processedData = [];
   let isVisible;
   let value;
+  let newFields;
 
   Object.keys(data).forEach(dataKey => {
     // check for row to be visible
     isVisible = true;
+    newFields = [];
     Object.keys(tableFields).forEach(fieldKey => {
       value = data[dataKey][fieldKey];
+      if(fieldKey === 'name'  && typeof data[dataKey].surname !== 'undefined') {
+        value = shortenName(value, data[dataKey].surname);
+      }
+      newFields[fieldKey] = value;
+
       // check for visible
       // if filter for this field exists
       if (typeof filters[fieldKey] !== 'undefined') {
@@ -82,7 +105,7 @@ const processData = (data, tableFields, filters) => {
       data[dataKey].bookStamp.match(/^921/);
 
     processedData.push({
-      ...data[dataKey],
+      ...newFields,
       isHighlighted,
       isVisible
     });

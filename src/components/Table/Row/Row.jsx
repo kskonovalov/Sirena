@@ -1,17 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { shortenName } from './helpers';
 
 const Row = props => {
   const { tableFields, data } = props;
 
   const renderField = key => {
     if (tableFields[key].visible) {
-      const value =
-        key === 'name' && typeof data.surname !== 'undefined'
-          ? shortenName(data.name, data.surname)
-          : data[key];
-      return <td key={key}>{value}</td>;
+      return <td key={key}>{data[key]}</td>;
     }
     return null;
   };
