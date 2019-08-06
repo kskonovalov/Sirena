@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useCookies } from 'react-cookie';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import DatePicker from 'react-datepicker';
 import Table from './Table';
 import FilterTableFields from './FilterTableFields';
 
-import {
-  apiUrl,
-  tableFieldsDefault,
-  selectLimits,
-  defaultDate
-} from '../config';
+import { apiUrl, tableFieldsConfig, selectLimits } from '../config';
 
 // method to get data from api
 const getDataFromApi = async (url, limit, date) => {
@@ -27,15 +23,20 @@ const getDataFromApi = async (url, limit, date) => {
 };
 
 function App() {
+  // cookies
+  const [cookies, setCookie] = useCookies();
+
   // params sent to api
-  const [limit, setLimit] = useState(selectLimits[0].value);
+  const defaultLimit = cookies.limit ? cookies.limit : selectLimits[0].value;
+  const [limit, setLimit] = useState(defaultLimit);
+  const defaultDate = cookies.date ? new Date(cookies.date) : new Date();
   const [date, setDate] = useState(defaultDate);
 
   // raw data from api
-  const [data, setData] = useState({});
+  const [data, setData] = useState([]);
 
   // updated data
-  const [filteredData, setFilteredData] = useState({});
+  const [filteredData, setFilteredData] = useState([]);
   const [filters, setFilters] = useState({});
 
   // some data stats received from api
@@ -47,14 +48,29 @@ function App() {
   const [highlightedMoney, setHighlightedMoney] = useState(0);
 
   // display highlighted only
-  const [highlightedOnly, toggleHighlightedOnly] = useState(false);
+  const defaultHighlighted = cookies.highlightedOnly && cookies.highlightedOnly === 'true';
+  const [highlightedOnly, toggleHighlightedOnly] = useState(defaultHighlighted);
 
   // table columns to display
-  const [tableFields, updateTableFields] = useState(tableFieldsDefault);
+  const defaultTableFields =
+    cookies.defaultTableFields &&
+    Object.keys(cookies.defaultTableFields).length === Object.keys(tableFieldsConfig).length
+      ? cookies.defaultTableFields
+      : tableFieldsConfig;
+  const [tableFields, updateTableFields] = useState(defaultTableFields);
+  useEffect(() => {
+    // save date to cookie
+    setCookie('defaultTableFields', tableFields);
+  }, [tableFields, setCookie]);
 
   // run 'get data from api' method
   useEffect(() => {
-    setData({});
+    // clear current data
+    setData([]);
+    setTotal(0);
+    setCount(0);
+    // save date to cookie
+    setCookie('date', date);
     (async () => {
       const result = await getDataFromApi(apiUrl, limit, date);
       const response = await result.json();
@@ -68,7 +84,7 @@ function App() {
         setCount(response.count);
       }
     })();
-  }, [date, limit]);
+  }, [date, limit, setCookie]);
 
   // filter data
   useEffect(() => {
@@ -176,66 +192,87 @@ function App() {
     setHighlightedMoney(result);
   }, [filteredData]);
 
-  const stat =
-    total > 0 ? (
-      <>
-        <p>
-          Из базы загружено {count} из {total} строк
-        </p>
-        <p>
-          Показано{' '}
-          {filteredData.reduce((sum, item) => {
-            return item.isVisible && (!highlightedOnly || item.isHighlighted)
-              ? sum + 1
-              : sum;
-          }, 0)}{' '}
-          из {count} строк
-        </p>
-      </>
-    ) : (
-      <></>
-    );
+  const stat = (
+    <div className="alert alert-secondary col-6">
+      <label htmlFor="setLimit">
+        Загрузить{' '}
+        <select
+          onChange={e => {
+            const newLimit = e.target.value;
+            // save limit to cookie
+            setCookie('limit', newLimit);
+            setLimit(parseInt(newLimit, 10));
+          }}
+          id="setLimit"
+          defaultValue={limit}
+        >
+          {selectLimits.map(el => (
+            <option key={el.value} value={el.value}>
+              {el.label}
+            </option>
+          ))}
+        </select>{' '}
+        строки из базы{' '}
+      </label>{' '}
+      за{' '}
+      <DatePicker
+        selected={date}
+        onChange={value => setDate(value)}
+        dateFormat="yyyy-MM-dd"
+        timeFormat=""
+      />
+      <p>
+        Из базы загружено {count} из {total} строк. Показано{' '}
+        {filteredData.reduce((sum, item) => {
+          return item.isVisible && (!highlightedOnly || item.isHighlighted)
+            ? sum + 1
+            : sum;
+        }, 0)}{' '}
+        из {count} строк.
+      </p>
+    </div>
+  );
 
   return (
     <div className="container">
-      <div className="row">
-        <div className="col-12">
+      <div className="row pt-5">
+        <div className="col-3">
           <h1>Sirena</h1>
+        </div>
+        <div className="alert alert-info col-5 text-center">
+          Не содержит записей TRAIN_TICKET!
+        </div>
+        <div className="col-12">
           {stat}
           <p>
-            Сумма: <b>{totalMoney}</b> &#x20bd;, Подходящие по фильтрам:{' '}
-            <b>{highlightedMoney}</b> &#x20bd;
-            <input type="button" value={
-              highlightedOnly ? 'Показать все' : 'Показать только подходящие'
-            } onClick={() => toggleHighlightedOnly(!highlightedOnly)}/>
+            Сумма: <b>{totalMoney}</b> &#x20bd;, подходящие по фильтрам:{' '}
+            <b>{highlightedMoney}</b> &#x20bd;{' '}
+            <input
+              type="button"
+              value={
+                highlightedOnly ? 'Показать все' : 'Показать только подходящие'
+              }
+              onClick={() => {
+                setCookie('highlightedOnly', !highlightedOnly);
+                toggleHighlightedOnly(!highlightedOnly);
+              }}
+            />
           </p>
         </div>
       </div>
       <div className="row">
-        <div className="col-3">
-          <label htmlFor='setLimit'>
-            Показать строк:{' '}
-            <select onChange={e => {
-              setLimit(parseInt(e.target.value, 10));
-            }} id='setLimit'>
-              {selectLimits.map(el => (
-                <option key={el.value} value={el.value}>
-                  {el.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <div className="col-9">
-          <DatePicker selected={date} onChange={value => setDate(value)} dateFormat="yyyy-MM-dd"
-                      timeFormat=""/>
-        </div>
-      </div>
-      <div className="row">
         <div className="col-12">
-          <FilterTableFields tableFields={tableFields} updateTableFields={updateTableFields}/>
-          <Table data={filteredData} tableFields={tableFields} setFilters={setFilters}
-                 highlightedOnly={highlightedOnly}/>
+          Скрыть/показать колонки:{' '}
+          <FilterTableFields
+            tableFields={tableFields}
+            updateTableFields={updateTableFields}
+          />
+          <Table
+            data={filteredData}
+            tableFields={tableFields}
+            setFilters={setFilters}
+            highlightedOnly={highlightedOnly}
+          />
         </div>
       </div>
     </div>

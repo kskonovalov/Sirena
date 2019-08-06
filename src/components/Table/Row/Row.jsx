@@ -1,6 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+// get the initials: Александр Иванович => А.И,
+const shortenName = (name, surname) => {
+  const initials = name.split(' ').reduce((prev, current) => {
+    return `${prev} ${current.charAt(0)}.`;
+  }, '');
+  return `${surname} ${initials}`;
+};
+
 const Row = props => {
   const { tableFields, data, highlightedOnly } = props;
 
@@ -8,11 +16,7 @@ const Row = props => {
     let value;
     if (tableFields[key].visible) {
       if (key === 'name' && typeof data.surname !== 'undefined') {
-        // get the initials: Александр Иванович => А.И,
-        const initials = data.name.split(' ').reduce((prev, current) => {
-          return `${prev} ${current.charAt(0)}.`;
-        }, '');
-        value = `${data.surname} ${initials}`;
+        value = shortenName(data.name, data.surname);
       } else {
         value = data[key];
       }
@@ -36,6 +40,7 @@ Row.propTypes = {
   ]),
   highlightedOnly: PropTypes.bool
 };
+
 Row.defaultProps = {
   data: {},
   highlightedOnly: false

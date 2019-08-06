@@ -1,4 +1,4 @@
-export const tableFieldsDefault = {
+export const tableFieldsConfig = {
   bsonum: {
     name: 'bsonum',
     visible: false,
@@ -73,6 +73,3 @@ export const selectLimits = [
 
 const apiUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:80/api/' : 'https://tst.flynow.ru/sirena/api/';
 export { apiUrl };
-
-const defaultDate = process.env.NODE_ENV === 'development' ? new Date('2019-07-13') : new Date();
-export { defaultDate };
