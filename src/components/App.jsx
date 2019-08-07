@@ -7,7 +7,7 @@ import Stat from './Stat';
 import Table from './Table';
 import FilterTableFields from './FilterTableFields';
 
-import { apiUrl, selectLimits } from '../config';
+import { getApiUrl, selectLimits } from '../config';
 import {
   getDataFromApi,
   getDefaultTableFields,
@@ -77,7 +77,7 @@ function App() {
     // save date to cookie
     setCookie('date', date);
     (async () => {
-      const result = await getDataFromApi(apiUrl, limit, date);
+      const result = await getDataFromApi(getApiUrl(), limit, date);
       const response = await result.json();
       if (typeof response.data !== 'undefined' && response.data.length > 0) {
         setData(response.data);

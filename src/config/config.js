@@ -51,5 +51,8 @@ export const selectLimits = [
   },
 ];
 
-const apiUrl = 'money.json';
-export { apiUrl };
+const getApiUrl = () => {
+  return Math.random() > 0.5 ? 'money.json' : 'money2.json';
+};
+
+export { getApiUrl };
