@@ -34,7 +34,7 @@ export const tableFieldsConfig = {
 
 export const selectLimits = [
   {
-    label: 'Все',
+    label: 'All',
     value: '-1',
   },
   {
@@ -51,5 +51,5 @@ export const selectLimits = [
   },
 ];
 
-const apiUrl = 'https://5d4998f45c331e00148eaaa4.mockapi.io/money';
+const apiUrl = 'money.json';
 export { apiUrl };

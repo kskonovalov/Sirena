@@ -16,7 +16,7 @@ const Stat = props => {
         {count} entries.
       </p>
       <p>
-        Sum: <b>{totalMoney}</b>$, fits by filters:{' '}
+        Sum: <b>{totalMoney}</b>$, fits by condition:{' '}
         <b>{highlightedMoney}</b>${' '}
       </p>
     </div>

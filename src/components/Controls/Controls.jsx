@@ -43,7 +43,7 @@ const Controls = props => {
       <input
         type="button"
         value={
-          highlightedOnly ? 'Show all' : 'Show by filters'
+          highlightedOnly ? 'Show all' : 'Show fits by condition only'
         }
         onClick={() => {
           toggleHighlightedOnly(!highlightedOnly);
