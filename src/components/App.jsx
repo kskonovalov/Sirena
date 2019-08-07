@@ -64,9 +64,9 @@ function App() {
   const defaultTableFields = getDefaultTableFields(cookies);
   const [tableFields, updateTableFields] = useState(defaultTableFields);
   // save date to cookie
-  useEffect(() => {
-    setCookie('defaultTableFields', tableFields);
-  }, [tableFields, setCookie]);
+  // useEffect(() => {
+  //   setCookie('defaultTableFields', tableFields);
+  // }, [tableFields, setCookie]);
 
   // run 'get data from api' method
   useEffect(() => {
@@ -116,7 +116,7 @@ function App() {
           <h1>Sirena</h1>
         </div>
         <div className="alert alert-info col-5 text-center">
-          Не содержит записей TRAIN_TICKET!
+          Demo project!
         </div>
         <div className="col-12">
           <Controls
@@ -138,7 +138,7 @@ function App() {
       </div>
       <div className="row">
         <div className="col-12">
-          Скрыть/показать колонки:{' '}
+          Display/hide columns:{' '}
           <FilterTableFields
             tableFields={tableFields}
             updateTableFields={updateTableFields}

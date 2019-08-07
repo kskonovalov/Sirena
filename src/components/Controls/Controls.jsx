@@ -15,7 +15,7 @@ const Controls = props => {
   return (
     <div className={`alert alert-secondary col-12}`}>
       <label htmlFor="setLimit">
-        Загрузить{' '}
+        Load{' '}
         <select
           onChange={e => {
             const newLimit = e.target.value;
@@ -30,20 +30,20 @@ const Controls = props => {
             </option>
           ))}
         </select>{' '}
-        строки из базы{' '}
+        entries from DB{' '}
       </label>{' '}
-      за{' '}
+      from{' '}
       <DatePicker
         selected={date}
         onChange={value => setDate(value)}
         dateFormat="yyyy-MM-dd"
         timeFormat=""
       />{' '}
-      и{' '}
+      and{' '}
       <input
         type="button"
         value={
-          highlightedOnly ? 'Показать все' : 'Показать только подходящие по фильтрам'
+          highlightedOnly ? 'Show all' : 'Show by filters'
         }
         onClick={() => {
           toggleHighlightedOnly(!highlightedOnly);

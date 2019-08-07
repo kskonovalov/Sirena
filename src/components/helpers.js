@@ -20,10 +20,11 @@ const getDataFromApi = async (url, limit, date) => {
   };
   const formData = new FormData();
   formData.append('json', JSON.stringify(payload));
-  return fetch(url, {
-    method: 'POST',
-    body: formData
-  });
+  // return fetch(url, {
+  //   method: 'POST',
+  //   body: formData
+  // });
+  return fetch(url);
 };
 export { getDataFromApi };
 
@@ -56,11 +57,12 @@ const processData = (data, tableFields, filters) => {
     newFields = [];
     Object.keys(tableFields).forEach(fieldKey => {
       value = data[dataKey][fieldKey];
-      if(fieldKey === 'name'  && typeof data[dataKey].surname !== 'undefined') {
-        value = shortenName(value, data[dataKey].surname);
-      }
-      newFields[fieldKey] = value;
 
+      if(typeof(tableFields[fieldKey].filter) === 'function') {
+        value = tableFields[fieldKey].filter(data[dataKey][fieldKey], data[dataKey]);
+      }
+
+      newFields[fieldKey] = value;
       // check for visible
       // if filter for this field exists
       if (typeof filters[fieldKey] !== 'undefined') {
@@ -93,16 +95,7 @@ const processData = (data, tableFields, filters) => {
     });
 
     // check for row to be highlighted
-    const isHighlighted =
-      // условие по наличным
-      // HA|CA						type
-      (data[dataKey].type.includes('НА') ||
-        data[dataKey].type.includes('HA')) && // in ru & en
-      data[dataKey].org === '' &&
-      // !99C (L)					General carrier
-      data[dataKey].generalCarrier !== '99C' &&
-      // 921 (R)						Book Stamp
-      data[dataKey].bookStamp.match(/^921/);
+    const isHighlighted = data[dataKey].filter;
 
     processedData.push({
       ...newFields,
@@ -119,13 +112,9 @@ const calculateTotalMoney = (data) => {
   let result = Object.keys(data).reduce((prev, id) => {
     let sum = prev;
     if (data[id].isVisible) {
-      const amount = parseFloat(data[id].amount);
-      if (!amount.isNaN) {
-        if (data[id].optype === 'SALE') {
-          sum += amount;
-        } else if (data[id].optype === 'REFUND') {
-          sum -= amount;
-        }
+      const money = parseFloat(data[id].money);
+      if (!Number.isNaN(money)) {
+        sum += money;
       }
     }
     return sum;
@@ -140,13 +129,9 @@ const calculateHighlightedMoney = (data) => {
   let result = Object.keys(data).reduce((prev, id) => {
     let sum = prev;
     if (data[id].isVisible && data[id].isHighlighted) {
-      const amount = parseFloat(data[id].amount);
-      if (!amount.isNaN) {
-        if (data[id].optype === 'SALE') {
-          sum += amount;
-        } else if (data[id].optype === 'REFUND') {
-          sum -= amount;
-        }
+      const money = parseFloat(data[id].money);
+      if (!Number.isNaN(money)) {
+        sum += money;
       }
     }
     return sum;

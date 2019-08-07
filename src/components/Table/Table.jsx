@@ -15,7 +15,7 @@ const Table = props => {
           {filterable && (
             <input
               type="text"
-              placeholder={exact ? `Точное значение ${key}` : `Часть ${key}`}
+              placeholder={exact ? `Exact ${key}` : `Part of ${key}`}
               onChange={e =>
                 setFilters({
                   [key]: {
@@ -55,8 +55,7 @@ const Table = props => {
         ) : (
           <tr>
             <td>
-              Ничего не нашлось, попробуйте изменить условия поиска или выбрать
-              другую дату
+              Nothing found. Try to change rules, or select different date
             </td>
           </tr>
         )}

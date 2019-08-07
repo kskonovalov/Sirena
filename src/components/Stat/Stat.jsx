@@ -12,12 +12,12 @@ const Stat = props => {
   return (
     <div className={`alert alert-info col-12}`}>
       <p>
-        Из базы загружено {count} из {total} строк. Показано {visible} из{' '}
-        {count} строк.
+        Loaded {count} from {total} entries. Displayed {visible} from{' '}
+        {count} entries.
       </p>
       <p>
-        Сумма: <b>{totalMoney}</b> &#x20bd;, подходящие по фильтрам:{' '}
-        <b>{highlightedMoney}</b> &#x20bd;{' '}
+        Sum: <b>{totalMoney}</b>$, fits by filters:{' '}
+        <b>{highlightedMoney}</b>${' '}
       </p>
     </div>
   );
