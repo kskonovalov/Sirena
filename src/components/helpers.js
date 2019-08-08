@@ -37,11 +37,10 @@ const getDataFromApi = async (url, limit, date) => {
   };
   const formData = new FormData();
   formData.append('json', JSON.stringify(payload));
-  // return fetch(url, {
-  //   method: 'POST',
-  //   body: formData
-  // });
-  return fetch(url);
+  return fetch(url, {
+    method: 'POST',
+    body: formData
+  });
 };
 export { getDataFromApi };
 
