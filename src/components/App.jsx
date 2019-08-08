@@ -7,10 +7,11 @@ import Stat from './Stat';
 import Table from './Table';
 import FilterTableFields from './FilterTableFields';
 
-import { getApiUrl, selectLimits } from '../config';
+import { getApiUrl, selectLimits, tableFieldsConfig } from '../config';
 import {
   getDataFromApi,
-  getDefaultTableFields,
+  getTableFieldsVisibleSettings,
+  getOnlyVisibleSettings,
   processData,
   calculateTotalMoney,
   calculateHighlightedMoney
@@ -61,12 +62,11 @@ function App() {
   }, [highlightedOnly, setCookie]);
 
   // table columns to display
-  const defaultTableFields = getDefaultTableFields(cookies);
-  const [tableFields, updateTableFields] = useState(defaultTableFields);
+  const [tableFields, updateTableFields] = useState(getTableFieldsVisibleSettings(tableFieldsConfig, cookies));
   // save date to cookie
-  // useEffect(() => {
-  //   setCookie('defaultTableFields', tableFields);
-  // }, [tableFields, setCookie]);
+  useEffect(() => {
+    setCookie('tableFieldsVisibleSettings', getOnlyVisibleSettings(tableFields));
+  }, [tableFields, setCookie]);
 
   // run 'get data from api' method
   useEffect(() => {

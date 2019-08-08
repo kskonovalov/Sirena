@@ -25,7 +25,7 @@ export const tableFieldsConfig = {
     name: 'Date',
     visible: true,
   },
-  filter: {
+  featured: {
     name: 'Fits by condition',
     visible: false,
     filter: booleanFilter,

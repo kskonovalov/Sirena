@@ -1,16 +1,33 @@
-import { tableFieldsConfig } from '../config';
-
 // table columns to display
-const getDefaultTableFields = cookies => {
-  // defined in cookies
-  return cookies.defaultTableFields &&
-    // simple check, if count of fields is the same as in config
-    Object.keys(cookies.defaultTableFields).length ===
-      Object.keys(tableFieldsConfig).length
-    ? cookies.defaultTableFields
-    : tableFieldsConfig;
+// get visible settings from cookies and return object with updated visibility
+const getTableFieldsVisibleSettings = (tableFieldsConfig, cookies) => {
+  const newObject = {};
+  Object.keys(tableFieldsConfig).forEach(key => {
+    newObject[key] =
+      typeof cookies.tableFieldsVisibleSettings !== 'undefined' &&
+      typeof cookies.tableFieldsVisibleSettings[key] !== 'undefined' &&
+      typeof cookies.tableFieldsVisibleSettings[key].visible !== 'undefined'
+        ? {
+            ...tableFieldsConfig[key],
+            visible: cookies.tableFieldsVisibleSettings[key].visible
+          }
+        : tableFieldsConfig[key];
+  });
+  return newObject;
 };
-export { getDefaultTableFields };
+export { getTableFieldsVisibleSettings };
+
+// get only visible settings for columns
+const getOnlyVisibleSettings = tableFieldsConfig => {
+  const newObject = {};
+  Object.keys(tableFieldsConfig).forEach(key => {
+    newObject[key] = {
+      visible: tableFieldsConfig[key].visible
+};
+  });
+  return newObject;
+};
+export { getOnlyVisibleSettings };
 
 // to get data from api
 const getDataFromApi = async (url, limit, date) => {
@@ -44,6 +61,14 @@ const shortenName = (name = '', surname = '') => {
 };
 export { shortenName };
 
+
+// here can be any check if need
+const checkForHighlighted = item => {
+  return typeof item.featured !== 'undefined' ? item.featured : false;
+};
+
+export { checkForHighlighted };
+
 // to get filter data
 const processData = (data, tableFields, filters) => {
   const processedData = [];
@@ -63,6 +88,7 @@ const processData = (data, tableFields, filters) => {
       }
 
       newFields[fieldKey] = value;
+
       // check for visible
       // if filter for this field exists
       if (typeof filters[fieldKey] !== 'undefined') {
@@ -95,7 +121,7 @@ const processData = (data, tableFields, filters) => {
     });
 
     // check for row to be highlighted
-    const isHighlighted = data[dataKey].filter;
+    const isHighlighted = checkForHighlighted(data[dataKey]);
 
     processedData.push({
       ...newFields,
