@@ -16,7 +16,7 @@ const FilterTableFields = props => {
   };
 
   return (
-    <ul className="btn-group list-inline">
+    <ul className="btn-group">
       {Object.keys(tableFields).map(key => (
         <li key={key} className="list-inline-item">
           <button

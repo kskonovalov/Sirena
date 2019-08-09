@@ -1,4 +1,4 @@
-import { nameFilter, booleanFilter } from '../components/fieldFilters';
+import { nameFilter, booleanFilter, dateMsToDateFilter } from '../components/fieldFilters';
 
 export const tableFieldsConfig = {
   id: {
@@ -24,6 +24,7 @@ export const tableFieldsConfig = {
   date: {
     name: 'Date',
     visible: true,
+    filter: dateMsToDateFilter
   },
   featured: {
     name: 'Fits by condition',
@@ -51,8 +52,6 @@ export const selectLimits = [
   },
 ];
 
-const getApiUrl = () => {
-  return Math.random() > 0.5 ? 'money.json' : 'money2.json';
-};
+const apiUrl = process.env.NODE_ENV === 'production' ? 'http://kskonovalov.me/samples/sirena/api/' : 'http://localhost:80/testapi/';
 
-export { getApiUrl };
+export { apiUrl };

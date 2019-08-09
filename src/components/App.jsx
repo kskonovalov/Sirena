@@ -7,7 +7,7 @@ import Stat from './Stat';
 import Table from './Table';
 import FilterTableFields from './FilterTableFields';
 
-import { getApiUrl, selectLimits, tableFieldsConfig } from '../config';
+import { apiUrl, selectLimits, tableFieldsConfig } from '../config';
 import {
   getDataFromApi,
   getTableFieldsVisibleSettings,
@@ -77,7 +77,7 @@ function App() {
     // save date to cookie
     setCookie('date', date);
     (async () => {
-      const result = await getDataFromApi(getApiUrl(), limit, date);
+      const result = await getDataFromApi(apiUrl, limit, date);
       const response = await result.json();
       if (typeof response.data !== 'undefined' && response.data.length > 0) {
         setData(response.data);
@@ -112,10 +112,10 @@ function App() {
   return (
     <div className="container">
       <div className="row pt-5">
-        <div className="col-3">
+        <div className="col-md-3 col-6">
           <h1>Sirena</h1>
         </div>
-        <div className="alert alert-info col-5 text-center">
+        <div className="alert alert-info col-md-5 col-6 text-center">
           Demo project!
         </div>
         <div className="col-12">

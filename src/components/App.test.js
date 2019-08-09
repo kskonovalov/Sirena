@@ -1,10 +1,8 @@
 import {
   shortenName,
-  getDefaultTableFields,
   calculateTotalMoney,
   calculateHighlightedMoney
 } from './helpers';
-import { tableFieldsConfig } from '../config';
 
 describe ('Get initials from full name test', () => {
   it('Should correctly work on my name', () => {
@@ -22,37 +20,25 @@ describe ('Get initials from full name test', () => {
 });
 
 describe('App component test', () => {
-  it('Should return default fields if cookie is empty', () => {
-    expect(getDefaultTableFields(false)).toEqual(tableFieldsConfig);
-  });
   const data = [
     {
-      amount: 100,
+      money: 100,
       isVisible: true,
       isHighlighted: true,
-      optype: 'SALE'
     },
     {
-      amount: 200,
-      isVisible: true,
-      isHighlighted: true,
-      optype: 'SALE'
-    },
-    {
-      amount: 500,
-      isVisible: false,
-      isHighlighted: true,
-      optype: 'SALE'
-    },
-    {
-      amount: 50,
+      money: 200,
       isVisible: true,
       isHighlighted: false,
-      optype: 'REFUND'
-    }
+    },
+    {
+      money: 500,
+      isVisible: false,
+      isHighlighted: true,
+    },
   ];
-  const totalMoney = 250;
-  const totalHighlightedMoney = 300;
+  const totalMoney = 300;
+  const totalHighlightedMoney = 100;
   it('calculateTotalMoney test', () => {
     expect(calculateTotalMoney(data)).toEqual(totalMoney);
   });

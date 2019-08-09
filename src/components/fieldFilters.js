@@ -12,3 +12,9 @@ const booleanFilter = field => {
   return field ? '+' : '-';
 };
 export { booleanFilter };
+
+const dateMsToDateFilter = field => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(field * 1000).toLocaleDateString("en-US", options);
+};
+export { dateMsToDateFilter };

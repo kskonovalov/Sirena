@@ -48,6 +48,7 @@ const Controls = props => {
         onClick={() => {
           toggleHighlightedOnly(!highlightedOnly);
         }}
+        className='mt-2'
       />
     </div>
   );

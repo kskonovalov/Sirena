@@ -1,1 +1,1 @@
-export * from './config';
+export { tableFieldsConfig, selectLimits, apiUrl } from './config';
