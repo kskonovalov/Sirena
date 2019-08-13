@@ -2,9 +2,9 @@ import {
   shortenName,
   calculateTotalMoney,
   calculateHighlightedMoney
-} from './helpers';
+} from './index';
 
-describe ('Get initials from full name test', () => {
+describe ('helpers: Get initials from full name test', () => {
   it('Should correctly work on my name', () => {
     const name = 'Konstantin Sergeevich';
     const surname = 'Konovalov';
@@ -19,7 +19,7 @@ describe ('Get initials from full name test', () => {
   });
 });
 
-describe('App component test', () => {
+describe('helpers: calculate money tests', () => {
   const data = [
     {
       money: 100,
