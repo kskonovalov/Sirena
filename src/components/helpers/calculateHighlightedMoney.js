@@ -1,6 +1,6 @@
 // get money of highlighted items
 const calculateHighlightedMoney = data => {
-  let result = Object.keys(data).reduce((prev, id) => {
+  const result = Object.keys(data).reduce((prev, id) => {
     let sum = prev;
     if (data[id].isVisible && data[id].isHighlighted) {
       const money = parseFloat(data[id].money);
@@ -10,7 +10,6 @@ const calculateHighlightedMoney = data => {
     }
     return sum;
   }, 0);
-  result = Math.round(result * 100) / 100;
-  return result;
+  return Math.round(result * 100) / 100;
 };
 export default calculateHighlightedMoney;
