@@ -1,4 +1,8 @@
-// get total money
+/**
+ * get total money
+ * @param data
+ * @returns {number}
+ */
 const calculateTotalMoney = data => {
   const result = Object.keys(data).reduce((prev, id) => {
     let sum = prev;

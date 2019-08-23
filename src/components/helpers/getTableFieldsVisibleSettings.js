@@ -1,5 +1,9 @@
-// table columns to display
-// get visible settings from cookies and return object with updated visibility
+/**
+ * table columns to display
+ * get visible settings from cookies and return object with updated visibility
+ * @param tableFieldsConfig
+ * @param cookies
+ */
 const getTableFieldsVisibleSettings = (tableFieldsConfig, cookies) => {
   const newObject = {};
   Object.keys(tableFieldsConfig).forEach(key => {

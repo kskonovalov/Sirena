@@ -1,0 +1,4 @@
+/*to prevent blinking while day update*/
+body {
+    overflow-y: scroll;
+}

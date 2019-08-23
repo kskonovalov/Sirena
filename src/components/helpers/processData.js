@@ -1,6 +1,12 @@
-// to get filter data
 import checkForHighlighted from './checkForHighlighted';
 
+/**
+ * to get filter data
+ * @param data
+ * @param tableFields
+ * @param filters
+ * @returns {[]}
+ */
 const processData = (data, tableFields, filters) => {
   const processedData = [];
   let isVisible;

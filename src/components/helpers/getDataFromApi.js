@@ -1,4 +1,10 @@
-// to get data from api
+/**
+ * to get data from api
+ * @param url
+ * @param limit
+ * @param date
+ * @returns {Promise<Response>}
+ */
 const getDataFromApi = async (url, limit, date) => {
   const payload = {
     limit,

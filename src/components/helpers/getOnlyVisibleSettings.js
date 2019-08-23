@@ -1,4 +1,7 @@
-// get only visible settings for columns
+/**
+ * get only visible settings for columns
+ * @param tableFieldsConfig
+ */
 const getOnlyVisibleSettings = tableFieldsConfig => {
   const newObject = {};
   Object.keys(tableFieldsConfig).forEach(key => {

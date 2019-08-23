@@ -5,3 +5,4 @@ export { default as shortenName } from './shortenName';
 export { default as processData } from './processData';
 export { default as calculateTotalMoney } from './calculateTotalMoney';
 export { default as calculateHighlightedMoney } from './calculateHighlightedMoney';
+export { default as updDaysInDate } from './updDaysInDate';

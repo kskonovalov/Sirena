@@ -1,4 +1,8 @@
-// get money of highlighted items
+/**
+ * get money of highlighted items
+ * @param data
+ * @returns {number}
+ */
 const calculateHighlightedMoney = data => {
   const result = Object.keys(data).reduce((prev, id) => {
     let sum = prev;
