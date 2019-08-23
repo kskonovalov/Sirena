@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker/es';
+import { updDaysInDate } from '../helpers';
 import { selectLimits } from '../../config';
 
 const Controls = props => {
@@ -39,6 +40,22 @@ const Controls = props => {
         dateFormat="yyyy-MM-dd"
         timeFormat=""
       />{' '}
+      <button
+        type="button"
+        onClick={() => {
+          setDate(updDaysInDate(date, 1, 'dec'));
+        }}
+      >
+        -1 day
+      </button>{' '}
+      <button
+        type="button"
+        onClick={() => {
+          setDate(updDaysInDate(date, 1, 'inc'));
+        }}
+      >
+        +1 day
+      </button>{' '}
       and{' '}
       <input
         type="button"
