@@ -1,7 +1,8 @@
 import {
   shortenName,
   calculateTotalMoney,
-  calculateHighlightedMoney
+  calculateHighlightedMoney,
+  updDaysInDate
 } from './index';
 
 describe ('helpers: Get initials from full name test', () => {
@@ -44,5 +45,18 @@ describe('helpers: calculate money tests', () => {
   });
   it('calculateHighlightedMoney test', () => {
     expect(calculateHighlightedMoney(data)).toEqual(totalHighlightedMoney);
+  });
+});
+
+describe('helpers: update days in date', () => {
+  const date = '2019-07-27';
+  it('plus one day test', () => {
+    expect(updDaysInDate(date, 1, 'inc')).toEqual(new Date('2019-07-28'));
+  });
+  it('minus one day test', () => {
+    expect(updDaysInDate(date, 1, 'dec')).toEqual(new Date('2019-07-26'));
+  });
+  it('should move to next month if need', () => {
+    expect(updDaysInDate(date, 10, 'inc')).toEqual(new Date('2019-08-06'));
   });
 });
