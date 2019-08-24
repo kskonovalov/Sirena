@@ -2,3 +2,12 @@
 body {
     overflow-y: scroll;
 }
+.filter-table-fields__drag {
+    cursor: move;
+    display: inline-block;
+    margin: 0 5px;
+    position: relative;
+    top: -2px;
+    font-size: 19px;
+    line-height: 8px;
+}

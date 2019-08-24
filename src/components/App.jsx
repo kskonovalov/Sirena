@@ -62,10 +62,28 @@ function App() {
   }, [highlightedOnly, setCookie]);
 
   // table columns to display
-  const [tableFields, updateTableFields] = useState(getTableFieldsVisibleSettings(tableFieldsConfig, cookies));
+  const [tableFields, updateTableFields] = useState(
+    getTableFieldsVisibleSettings(tableFieldsConfig, cookies)
+  );
+  // update order of tableFields on update
+  useEffect(() => {
+    const orderedTableKeys = Object.keys(tableFields).sort((a, b) => {
+      return tableFields[a].index - tableFields[b].index;
+    });
+    const orderedTableFields = {};
+    orderedTableKeys.forEach(item => {
+      orderedTableFields[item] = tableFields[item];
+    });
+    if (JSON.stringify(tableFields) !== JSON.stringify(orderedTableFields)) {
+      updateTableFields(orderedTableFields);
+    }
+  }, [tableFields]);
   // save date to cookie
   useEffect(() => {
-    setCookie('tableFieldsVisibleSettings', getOnlyVisibleSettings(tableFields));
+    setCookie(
+      'tableFieldsVisibleSettings',
+      getOnlyVisibleSettings(tableFields)
+    );
   }, [tableFields, setCookie]);
 
   // run 'get data from api' method

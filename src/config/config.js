@@ -4,32 +4,38 @@ export const tableFieldsConfig = {
   id: {
     name: 'ID',
     visible: false,
+    index: 1,
   },
   name: {
     name: 'Name',
     visible: true,
     filterable: true,
-    filter: nameFilter
+    filter: nameFilter,
+    index: 2,
   },
   money: {
     name: 'Money',
     visible: true,
+    index: 3,
   },
   zip: {
     name: 'Zip code',
     visible: true,
     filterable: true,
     exact: true,
+    index: 4,
   },
   date: {
     name: 'Date',
     visible: true,
-    filter: dateMsToDateFilter
+    filter: dateMsToDateFilter,
+    index: 5,
   },
   featured: {
     name: 'Fits by condition',
     visible: false,
     filter: booleanFilter,
+    index: 6,
   },
 };
 
